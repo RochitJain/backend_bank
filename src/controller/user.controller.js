@@ -36,11 +36,11 @@ async function userLoginContoller (req,res) {
 
     const user = await userModel.findOne({email})
     
-    if(!user) res.send(422).json({message: "User not found"})
+    if(!user) res.status(422).json({message: "User not found"})
     
     const isValidPassword = await user.comparePassword(password)
 
-    if(!isValidPassword) res.send(422).json({ message: "Password not matching"})
+    if(!isValidPassword) res.status(422).json({ message: "Password not matching"})
     
     const token = jwt.sign({userId: user._id}, process.env.JWT_KEY, {expiresIn: '3d'})
 
