@@ -6,7 +6,7 @@ async function authMiddleware(req, res, next) {
         const token = req.cookies.token || req.headers.authorization?.split(" ")[1]
 
         if(!token){
-            res.status(401).json({
+            return res.status(401).json({
                 message: "User not authorized"
             })
         }
@@ -19,7 +19,7 @@ async function authMiddleware(req, res, next) {
 
 
     }catch(err) {
-        res.status(401).json({message: err.message})
+        return res.status(401).json({message: err.message})
     }
 }
 

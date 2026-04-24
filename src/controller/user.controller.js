@@ -1,11 +1,11 @@
-const userModel = require('../models/user.models')
+const userService = require('../service/user.service')
 const jwt = require('jsonwebtoken')
 
 async function userRegisterContoller (req,res){
 
     const {email, password, name} = req.body;
 
-    const isExists = await userModel.findOne({email})
+    const isExists = await userService.checkUserExists(email)
 
     if (isExists){
         return res.status(422).json({
@@ -13,14 +13,12 @@ async function userRegisterContoller (req,res){
             status: "failed"
         })
     }
-    const user = await userModel.create({
-        email,password,name
-    })
+    const user = await userService.createUser(email,password,name)
 
     const token = jwt.sign({userId: user._id}, process.env.JWT_KEY, {expiresIn: '3d'})
 
     res.cookie('token', token)
-    res.status(201).json({
+    return res.status(201).json({
         user:{
             _id : user._id,
             email: user.email,
@@ -34,13 +32,13 @@ async function userLoginContoller (req,res) {
 
     const {email, password} = req.body
 
-    const user = await userModel.findOne({email})
+    const user = await userService.checkUserExists(email)
     
-    if(!user) res.status(422).json({message: "User not found"})
+    if(!user) return res.status(422).json({message: "User not found"})
     
     const isValidPassword = await user.comparePassword(password)
 
-    if(!isValidPassword) res.status(422).json({ message: "Password not matching"})
+    if(!isValidPassword) returnres.status(422).json({ message: "Password not matching"})
     
     const token = jwt.sign({userId: user._id}, process.env.JWT_KEY, {expiresIn: '3d'})
 
