@@ -4,6 +4,7 @@ const auth = require('../middleware/auth.middleware')
 const accountController = require('../controller/account.controller')
 
 router.post('/create', auth.authMiddleware, accountController.createAccountController)
-// router.get('/user-info', authMiddleware, accountController)
+router.get('/account-info', auth.authMiddleware, accountController.getUserInfoController)
+router.get('/balance', auth.authMiddleware, accountController.getBalanceController)
 
 module.exports  = router

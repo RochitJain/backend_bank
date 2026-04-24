@@ -9,5 +9,17 @@ async function createAccountController(req, res) {
     })
 }
 
+async function getUserInfoController(req, res) {
+    const accounts = await accountService.getAccountDetails(req.user._id)
+    return res.status(200).json(accounts);
+    
+}
 
-module.exports = {createAccountController}
+async function getBalanceController(req, res) {
+    const balance = await accountService.getAccountBalance(req.user._id);
+    return res.status(200).json({balance, accountId: req.user._id})
+    
+}
+
+
+module.exports = {createAccountController, getUserInfoController, getBalanceController}

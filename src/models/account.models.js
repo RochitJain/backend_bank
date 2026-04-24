@@ -20,6 +20,12 @@ const accountSchema = new mongoose.Schema({
         required: [true, 'amount needed for creating an account'],
         default : 'INR'
 
+    },
+    admin:{
+        type: Boolean,
+        immutable: true,
+        default: false,
+        select: false
     }
 }, {
         timestamps: true
@@ -30,7 +36,7 @@ accountSchema.index({user: 1, status: 1})
 
 accountSchema.methods.getBalance = async function () {
     const balanceData = await ledgerModel.aggregate([
-        {$match: {account: this._id}},
+        {$match: {account: this._id.toString()}},
         {
             $group :{
                 _id: null,
