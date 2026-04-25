@@ -9,7 +9,7 @@ const transactionRouter = require('./routes/transaction.routes')
 app.use(express.json())
 app.use(cookieParser())
 
-
+app.get('/',(req,res)=>{res.send('Project is Live')})
 app.use('/api/auth', userRouter)
 app.use('/api/account', accountRouter)
 app.use('/api/transaction', transactionRouter)
