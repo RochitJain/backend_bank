@@ -18,7 +18,7 @@ async function isTransactionExists (idempotencyKey) {
         idempotencyKey
     })
     if(accountDetails){
-        if(accountDetails.status === 'COMPLETE') return {status: 'COMPLETE', accountDetails}
+        if(accountDetails.status === 'COMPLETE') return {status: 'Transaction Already Completed', accountDetails}
         if(accountDetails.status ==='PENDING') return {status: 'PENDING'}
         if(accountDetails.status === 'FAILED') return {status: 'FAILED'}
     }
