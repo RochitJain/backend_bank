@@ -1,10 +1,15 @@
 const accountService = require("../service/account.service");
+const AppError = require("../utils/AppError");
+
 
 async function createAccountController(req, res) {
   const user = req.user;
+  if (!req.user) {
+  throw new AppError("Unauthorized", 401);
+}
   const account = await accountService.create(user);
   return res.status(201).json({
-    account,
+    account
   });
 }
 

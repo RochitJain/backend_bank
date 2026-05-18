@@ -5,6 +5,7 @@ const userRouter = require("./routes/user.routes");
 const accountRouter = require("./routes/account.routes");
 const cookieParser = require("cookie-parser");
 const transactionRouter = require("./routes/transaction.routes");
+const errorMiddleware = require('../src/middleware/error.middleware')
 
 app.use(express.json());
 app.use(cookieParser());
@@ -23,4 +24,6 @@ app.get("/", (req, res) => {
 app.use("/api/auth", userRouter);
 app.use("/api/account", accountRouter);
 app.use("/api/transaction", transactionRouter);
+
+app.use(errorMiddleware)
 module.exports = app;

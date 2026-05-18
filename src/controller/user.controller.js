@@ -1,18 +1,19 @@
 const userService = require("../service/user.service");
 const jwt = require("jsonwebtoken");
 const blacklistModel = require("../models/blacklist.model");
+const AppError = require("../utils/AppError");
 
-async function userRegisterContoller(req, res) {
-  const { email, password, name } = req.body;
+async function userRegisterController(req, res) {
+  const { email, password, name } = req.body || {};
+  if (!email || !password || !name) {
+    throw new AppError("All fields are required", 400);
+  }
 
   const isExists = await userService.checkUserExists(email);
-
   if (isExists) {
-    return res.status(422).json({
-      message: "User already exists with email",
-      status: "failed",
-    });
+    throw new AppError("User already exists with email", 409)
   }
+
   const user = await userService.createUser(email, password, name);
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, {
@@ -30,16 +31,17 @@ async function userRegisterContoller(req, res) {
 }
 
 async function userLoginContoller(req, res) {
-  const { email, password } = req.body;
-
+  const { email, password } = req.body || {};
+  if(!email || !password){
+    throw new AppError('Field is missing',400)
+  }
   const user = await userService.checkUserExists(email);
 
-  if (!user) return res.status(422).json({ message: "User not found" });
+  if (!user) throw new AppError('User not found', 422)
 
   const isValidPassword = await user.comparePassword(password);
 
-  if (!isValidPassword)
-    returnres.status(422).json({ message: "Password not matching" });
+  if (!isValidPassword) throw new AppError('Invalid Password', 401)
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, {
     expiresIn: "1d",
@@ -63,7 +65,7 @@ async function userLogoutController(req, res) {
 }
 
 module.exports = {
-  userRegisterContoller,
+  userRegisterController,
   userLoginContoller,
   userLogoutController,
 };

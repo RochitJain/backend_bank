@@ -4,19 +4,20 @@ const transactionService = require("../service/transaction.service");
 const accountService = require("../service/account.service");
 const mongoose = require("mongoose");
 const ledgerModel = require("../models/ledger.model");
+const AppError = require("../utils/AppError");
 
 async function createTransaction(req, res) {
   const { fromAccount, toAccount, idempotencyKey, amount } = req.body;
 
   if (!fromAccount || !toAccount || !idempotencyKey || !amount) {
-    return res.status(400).json({ message: "Some field is missing" });
+    throw new AppError("Some field is missing", 400);
   }
 
   const fromAccountDetails =
     await accountService.checkAccountDetails(fromAccount);
   const toAccountDetails = await accountService.checkAccountDetails(toAccount);
   if (!fromAccountDetails || !toAccountDetails)
-    return res.status(400).json({ message: "Invalid Account" });
+    throw new AppError("Account not found" , 400);
 
   //check idempotency key
   const isTransactionExists =
@@ -28,14 +29,12 @@ async function createTransaction(req, res) {
     fromAccountDetails.status !== "ACTIVE" ||
     toAccountDetails.status !== "ACTIVE"
   )
-    return res.status(400).json({ message: "Account not active" });
+    throw new AppError("Account not active", 403);
 
   //check balance from sender
   const balance = await fromAccountDetails.getBalance();
   if (balance < amount)
-    return res
-      .status(400)
-      .json({ message: `Insufficient Balance ${balance}, amount ${amount}` });
+    throw new AppError (`Insufficient Balance ${balance}, amount ${amount}`, 404);
 
   //adding transaction
   const session = await mongoose.startSession();
@@ -90,27 +89,27 @@ async function createTransaction(req, res) {
     await session.commitTransaction();
   } catch (err) {
     session.abortTransaction();
+    throw new AppError('session Aborted')
   } finally {
     session.endSession();
-    return res.status(201).json({ message: "Trasaction completed" });
   }
 }
 
 async function createInitialTransaction(req, res) {
   const { toAccount, idempotencyKey, amount } = req.body;
   if (!toAccount || !idempotencyKey || !amount) {
-    return res.status(400).json({ message: "Some field is missing" });
+    throw new AppError("Some field is missing", 400);
   }
 
   const toAccountDetails = await accountService.checkAccountDetails(toAccount);
   if (!toAccountDetails)
-    return res.status(400).json({ message: "Invalid Account" });
+    throw new AppError("Account not found" , 400);
 
   const fromAccountDetails = await accountService.checkSystemAccountDetails(
     req.user,
   );
   if (!fromAccountDetails)
-    return res.status(400).json({ message: "Invalid Admin Account" });
+    throw new AppError("Account not found" , 400);
 
   const session = await mongoose.startSession();
   try {
@@ -155,7 +154,6 @@ async function createInitialTransaction(req, res) {
     session.abortTransaction();
   } finally {
     session.endSession();
-    return res.status(201).json({ message: "Trasaction completed" });
   }
 }
 
