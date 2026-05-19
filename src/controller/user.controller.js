@@ -20,7 +20,6 @@ async function userRegisterController(req, res) {
     expiresIn: "1d",
   });
 
-  res.cookie("token", token);
   return res.status(201).json({
     user: {
       _id: user._id,

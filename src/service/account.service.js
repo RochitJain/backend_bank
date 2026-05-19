@@ -12,7 +12,7 @@ async function checkAccountDetails(id) {
 
 async function checkSystemAccountDetails(user) {
   const accountDetails = await accountModel.findOne({
-    user,
+    user: user._id,
     admin: true,
   });
   return accountDetails;
@@ -22,23 +22,22 @@ async function create(user) {
   const isAccountExsist = await accountModel.findOne({user: user._id})
   if(isAccountExsist) throw new AppError("Account already exists", 409);
 
-  const userCreated = await accountModel.create({ user: user._id });
-  if (userCreated) return userCreated;
+  const accountCreate = await accountModel.create({ user: user._id });
+  if (accountCreate) return accountCreate;
 }
 
 async function getAccountDetails(user) {
-  const accounts = await accountModel.find({ user });
+  const accounts = await accountModel.findOne({ user });
   return accounts;
 }
 
 async function getAccountBalance(user) {
-  const userInfo = await accountModel.findOne({ user });
-  if (!userInfo) {
+  const accountInfo = await accountModel.findOne({ user });
+  if (!accountInfo) {
   throw new AppError("Account not found", 404);
 }
-
-  const balance = await userInfo.getBalance();
-  return balance;
+  const balance = await accountInfo.getBalance();
+  return {balance,accountInfo};
 }
 
 module.exports = {

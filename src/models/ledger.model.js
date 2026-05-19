@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ledgerSchema = new mongoose.Schema(
   {
     account: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "account",
       required: [true, "account needed"],
       immutable: true,

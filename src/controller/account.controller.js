@@ -19,8 +19,9 @@ async function getUserInfoController(req, res) {
 }
 
 async function getBalanceController(req, res) {
-  const balance = await accountService.getAccountBalance(req.user._id);
-  return res.status(200).json({ balance, accountId: req.user._id });
+  const {balance, accountInfo} = await accountService.getAccountBalance(req.user._id);
+
+  return res.status(200).json({ balance, account: accountInfo._id});
 }
 
 module.exports = {
