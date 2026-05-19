@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 const transactionRouter = require("./routes/transaction.routes");
 const errorMiddleware = require('../src/middleware/error.middleware')
 
-app.use(express.json());
+app.use(express.json({limit: '10kb'}));
 app.use(cookieParser());
 
 const limiter = rateLimit({
