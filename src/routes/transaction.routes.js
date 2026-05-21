@@ -3,9 +3,9 @@ const router = express.Router();
 const auth = require("../middleware/auth.middleware");
 const transactionController = require("../controller/transaction.controller");
 
-router.post("/", auth.authMiddleware, transactionController.createTransaction);
+router.post("/transaction", auth.authMiddleware, transactionController.createTransaction);
 router.post(
-  "/system/initialfund",
+  "/transaction/system/initialfund",
   auth.authSystemMiddleware,
   transactionController.createInitialTransaction,
 );

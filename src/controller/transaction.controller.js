@@ -1,29 +1,36 @@
 const transactionModel = require("../models/transaction.model");
 const accountModel = require("../models/account.models");
 const transactionService = require("../service/transaction.service");
-const accountService = require("../service/account.service");
+const accountService = require("../service/account.service.js");
 const mongoose = require("mongoose");
 const ledgerModel = require("../models/ledger.model");
 const AppError = require("../utils/AppError");
+const transactionSchemaValidator = require("../validator/transaction/transaction.validator.js");
+const logger = require("../config/logger.js");
 
 async function createTransaction(req, res) {
-  const {toAccount, idempotencyKey, amount } = req.body;
+  logger.info("in /transaction/create");
+  const { error, value } = transactionSchemaValidator.validate(req.body, {
+    abortEarly: false,
+  });
 
+  if (error) {
+    const errorDetails = error.details.map((err) => err.message);
+    throw new AppError(errorDetails, 400);
+  }
+  const { toAccount, idempotencyKey, amount } = value;
   if (!toAccount || !idempotencyKey || !amount) {
     throw new AppError("Some field is missing", 400);
   }
-  const user = req.user._id
-  const fromAccountDetails = await accountService.getAccountDetails(user)
+  const user = req.user._id;
+  const fromAccountDetails = await accountService.getAccountDetails(user);
 
   const toAccountDetails = await accountService.checkAccountDetails(toAccount);
-  if (!toAccountDetails)
-    throw new AppError("Account not found" , 400);
 
   //check idempotency key
   const isTransactionExists =
     await transactionService.isTransactionExists(idempotencyKey);
   if (isTransactionExists) return res.json(isTransactionExists);
-
   //account status check
   if (
     fromAccountDetails.status !== "ACTIVE" ||
@@ -35,7 +42,10 @@ async function createTransaction(req, res) {
   const balance = await fromAccountDetails.getBalance();
 
   if (balance < amount)
-    throw new AppError (`Insufficient Balance ${balance}, amount ${amount}`, 404);
+    throw new AppError(
+      `Insufficient Balance ${balance}, amount ${amount}`,
+      404,
+    );
 
   //adding transaction
   const session = await mongoose.startSession();
@@ -46,7 +56,7 @@ async function createTransaction(req, res) {
       await transactionModel.create(
         [
           {
-            fromAccount:fromAccountDetails._id,
+            fromAccount: fromAccountDetails._id,
             toAccount,
             amount,
             idempotencyKey,
@@ -56,7 +66,7 @@ async function createTransaction(req, res) {
         { session },
       )
     )[0];
-
+    logger.info("transaction in pending state....");
     await ledgerModel.create(
       [
         {
@@ -80,22 +90,21 @@ async function createTransaction(req, res) {
       ],
       { session },
     );
-
+    logger.info("ledger entries created");
     await transactionModel.findByIdAndUpdate(
       { _id: transaction._id },
       { status: "COMPLETE" },
       { session },
     );
-  
     await session.commitTransaction();
-
+    logger.info("transaction is completed....");
     return res.status(201).json({
-    success: true,
-    message: "Transaction completed"
-  });
+      success: true,
+      message: "Transaction completed",
+    });
   } catch (err) {
     session.abortTransaction();
-    throw new AppError('session Aborted')
+    throw new AppError("session Aborted");
   } finally {
     session.endSession();
   }
@@ -106,19 +115,16 @@ async function createInitialTransaction(req, res) {
   if (!toAccount || !idempotencyKey || !amount) {
     throw new AppError("Some field is missing", 400);
   }
-  const toAccountDetails = await accountService.checkAccountDetails(toAccount);
-  if (!toAccountDetails)
-    throw new AppError("Account not found" , 400);
-
+  await accountService.checkAccountDetails(toAccount);
   const fromAccountDetails = await accountService.checkSystemAccountDetails(
     req.user,
   );
-  if (!fromAccountDetails)
-    throw new AppError("Account not found" , 400);
-
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
+    const isTransactionExists =
+      await transactionService.isTransactionExists(idempotencyKey);
+    if (isTransactionExists) return res.json(isTransactionExists);
 
     const transaction = await transactionModel.create({
       fromAccount: fromAccountDetails._id,
@@ -156,13 +162,14 @@ async function createInitialTransaction(req, res) {
       { session },
     );
     await session.commitTransaction();
+    logger.info('transaction is completed....')
     return res.status(201).json({
-    success: true,
-    message: "Transaction completed"
-  });
+      success: true,
+      message: "Transaction completed",
+    });
   } catch (err) {
     session.abortTransaction();
-    throw new AppError(err, 500)
+    throw new AppError(err, 500);
   } finally {
     session.endSession();
   }

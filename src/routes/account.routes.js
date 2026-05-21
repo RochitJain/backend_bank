@@ -4,17 +4,17 @@ const auth = require("../middleware/auth.middleware");
 const accountController = require("../controller/account.controller");
 
 router.post(
-  "/create",
+ "/account/create",
   auth.authMiddleware,
   accountController.createAccountController,
 );
 router.get(
-  "/account-info",
+ "/account/account-info",
   auth.authMiddleware,
   accountController.getUserInfoController,
 );
 router.get(
-  "/balance",
+ "/account/balance",
   auth.authMiddleware,
   accountController.getBalanceController,
 );

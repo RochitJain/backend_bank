@@ -3,14 +3,14 @@ const mongoose = require("mongoose");
 const transactionSchema = new mongoose.Schema(
   {
     fromAccount: {
-      type: String,
+      type: mongoose.Types.ObjectId,
       required: [true, "From Account needed for entry"],
       index: true,
       immutable: true,
       ref: "account",
     },
     toAccount: {
-      type: String,
+      type: mongoose.Types.ObjectId,
       required: [true, "To Account needed for entry"],
       index: true,
       ref: "account",
