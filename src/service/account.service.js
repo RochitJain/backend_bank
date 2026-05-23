@@ -6,7 +6,7 @@ async function checkAccountDetails(id) {
     _id: id,
   });
   if (!accountDetails) throw new AppError("To Account not found", 404);
-    
+
   return accountDetails;
 }
 
@@ -16,13 +16,13 @@ async function checkSystemAccountDetails(user) {
     admin: true,
   });
   if (!accountDetails) throw new AppError("From Account not found", 404);
-  
+
   return accountDetails;
 }
 
 async function create(user) {
-  const isAccountExsist = await accountModel.findOne({user: user._id})
-  if(isAccountExsist) throw new AppError("Account already exists", 409);
+  const isAccountExsist = await accountModel.findOne({ user: user._id });
+  if (isAccountExsist) throw new AppError("Account already exists", 409);
 
   const accountCreate = await accountModel.create({ user: user._id });
   if (accountCreate) return accountCreate;
@@ -30,19 +30,19 @@ async function create(user) {
 
 async function getAccountDetails(user) {
   const accounts = await accountModel.findOne({ user });
-    if (!accounts) {
+  if (!accounts) {
     throw new AppError("Account not found", 404);
-} 
+  }
   return accounts;
 }
 
 async function getAccountBalance(user) {
   const accountInfo = await accountModel.findOne({ user });
   if (!accountInfo) {
-  throw new AppError("Account not found", 404);
-}
+    throw new AppError("Account not found", 404);
+  }
   const balance = await accountInfo.getBalance();
-  return {balance,accountInfo};
+  return { balance, accountInfo };
 }
 
 module.exports = {

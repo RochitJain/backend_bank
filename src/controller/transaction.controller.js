@@ -8,8 +8,8 @@ const AppError = require("../utils/AppError");
 const transactionSchemaValidator = require("../validator/transaction/transaction.validator.js");
 const logger = require("../config/logger.js");
 
-async function createTransaction(req, res) {
-  logger.info("in /transaction/create");
+async function createTransactionController(req, res) {
+  logger.info("in createTransactionController");
   const { error, value } = transactionSchemaValidator.validate(req.body, {
     abortEarly: false,
   });
@@ -66,7 +66,7 @@ async function createTransaction(req, res) {
         { session },
       )
     )[0];
-    logger.info("transaction in pending state....");
+    logger.info("transaction is pending ....");
     await ledgerModel.create(
       [
         {
@@ -110,7 +110,8 @@ async function createTransaction(req, res) {
   }
 }
 
-async function createInitialTransaction(req, res) {
+async function createInitialTransactionController(req, res) {
+  logger.info('in createInitialTransactionController')
   const { toAccount, idempotencyKey, amount } = req.body;
   if (!toAccount || !idempotencyKey || !amount) {
     throw new AppError("Some field is missing", 400);
@@ -133,7 +134,7 @@ async function createInitialTransaction(req, res) {
       idempotencyKey,
       status: "PENDING",
     });
-
+    logger.info('transaction is pending.....')
     await ledgerModel.create(
       [
         {
@@ -156,6 +157,7 @@ async function createInitialTransaction(req, res) {
       ],
       { session },
     );
+    logger.info('ledger entries created')
     await transactionModel.findByIdAndUpdate(
       { _id: transaction._id },
       { status: "COMPLETE" },
@@ -175,4 +177,4 @@ async function createInitialTransaction(req, res) {
   }
 }
 
-module.exports = { createTransaction, createInitialTransaction };
+module.exports = { createTransactionController, createInitialTransactionController };

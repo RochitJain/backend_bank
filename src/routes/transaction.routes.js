@@ -3,11 +3,15 @@ const router = express.Router();
 const auth = require("../middleware/auth.middleware");
 const transactionController = require("../controller/transaction.controller");
 
-router.post("/transaction", auth.authMiddleware, transactionController.createTransaction);
+router.post(
+  "/transaction",
+  auth.authMiddleware,
+  transactionController.createTransactionController,
+);
 router.post(
   "/transaction/system/initialfund",
   auth.authSystemMiddleware,
-  transactionController.createInitialTransaction,
+  transactionController.createInitialTransactionController,
 );
 
 module.exports = router;
