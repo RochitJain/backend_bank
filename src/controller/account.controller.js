@@ -13,6 +13,7 @@ async function createAccountController(req, res) {
   const account = await accountService.create(user);
   logger.info('Account Created')
   return res.status(201).json({
+    success: true,
     account
   });
 }
@@ -20,14 +21,14 @@ async function createAccountController(req, res) {
 async function getUserInfoController(req, res) {
   logger.info('in getUserInfoController')
   const accounts = await accountService.getAccountDetails(req.user._id);
-  return res.status(200).json(accounts);
+  return res.status(200).json({accounts, success: true});
 }
 
 async function getBalanceController(req, res) {
   logger.info('in getBalanceController');
   const {balance, accountInfo} = await accountService.getAccountBalance(req.user._id);
 
-  return res.status(200).json({ balance, account: accountInfo._id});
+  return res.status(200).json({ balance, account: accountInfo._id, success: true});
 }
 
 module.exports = {

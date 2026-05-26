@@ -18,21 +18,24 @@ async function userRegisterController(req, res) {
     throw new AppError(errorDetails, 400);
   }
   const { email, password, name } = value;
-
   const isExists = await userService.checkUserExists(email);
   if (isExists) {
-    throw new AppError("User already exists with email", 409);
+    throw new AppError( "User already exists with email", 409);
   }
-
+  
   const user = await userService.createUser(email, password, name);
   logger.info("User Registered with name", user.name);
   return res.status(201).json({
-    user: {
-      _id: user._id,
-      email: user.email,
-      name: user.name,
-    },
-  });
+    success: true,
+    message: "User Registered Successfully",
+    data: {
+      user: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+    }
+  }
+  })
 }
 
 async function userLoginContoller(req, res) {
@@ -63,6 +66,7 @@ async function userLoginContoller(req, res) {
     _id: user._id,
     email: user.email,
     name: user.name,
+    success: true
   });
 }
 
