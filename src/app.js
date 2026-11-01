@@ -4,8 +4,10 @@ const { rateLimit } = require("express-rate-limit");
 const userRouter = require("./routes/user.routes");
 const accountRouter = require("./routes/account.routes");
 const cookieParser = require("cookie-parser");
+const {register} = require('./config/metrics')
 const transactionRouter = require("./routes/transaction.routes");
-const errorMiddleware = require('../src/middleware/error.middleware')
+const errorMiddleware = require('../src/middleware/error.middleware');
+const requestLogger = require('./middleware/logger.middleware')
 
 app.use(express.json({limit: '10kb'}));
 app.use(cookieParser());
@@ -17,9 +19,15 @@ const limiter = rateLimit({
   legacyHeaders: false,
   ipv6Subnet: 56,
 });
+app.use(requestLogger)
 app.use(limiter);
 app.get("/", (req, res) => {
   res.send("Project is Live");
+});
+app.get("/metrics", async (req, res) => {
+/Users/rochit/incidentCopilot/src/config/metricsParser.js
+    res.set("Content-Type", register.contentType);
+    res.end(await register.metrics());
 });
 app.use("/api/v1", userRouter);
 app.use("/api/v1", accountRouter);

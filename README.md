@@ -149,3 +149,6 @@ What I Learned
 Deployment
 
 Hosted on Render.
+
+npm run dev --- for normally running
+npm test --- for jest

@@ -6,10 +6,8 @@ const mongoose = require("mongoose");
 const ledgerModel = require("../models/ledger.model");
 const AppError = require("../utils/AppError");
 const transactionSchemaValidator = require("../validator/transaction/transaction.validator.js");
-const logger = require("../config/logger.js");
 
 async function createTransactionController(req, res) {
-  logger.info("in createTransactionController");
   const { error, value } = transactionSchemaValidator.validate(req.body, {
     abortEarly: false,
   });
@@ -66,7 +64,6 @@ async function createTransactionController(req, res) {
         { session },
       )
     )[0];
-    logger.info("transaction is pending ....");
     await ledgerModel.create(
       [
         {
@@ -90,14 +87,12 @@ async function createTransactionController(req, res) {
       ],
       { session },
     );
-    logger.info("ledger entries created");
     await transactionModel.findByIdAndUpdate(
       { _id: transaction._id },
       { status: "COMPLETE" },
       { session },
     );
     await session.commitTransaction();
-    logger.info("transaction is completed....");
     return res.status(201).json({
       success: true,
       message: "Transaction completed",
@@ -111,7 +106,6 @@ async function createTransactionController(req, res) {
 }
 
 async function createInitialTransactionController(req, res) {
-  logger.info('in createInitialTransactionController')
   const { toAccount, idempotencyKey, amount } = req.body;
   if (!toAccount || !idempotencyKey || !amount) {
     throw new AppError("Some field is missing", 400);
@@ -134,7 +128,6 @@ async function createInitialTransactionController(req, res) {
       idempotencyKey,
       status: "PENDING",
     });
-    logger.info('transaction is pending.....')
     await ledgerModel.create(
       [
         {
@@ -157,14 +150,12 @@ async function createInitialTransactionController(req, res) {
       ],
       { session },
     );
-    logger.info('ledger entries created')
     await transactionModel.findByIdAndUpdate(
       { _id: transaction._id },
       { status: "COMPLETE" },
       { session },
     );
     await session.commitTransaction();
-    logger.info('transaction is completed....')
     return res.status(201).json({
       success: true,
       message: "Transaction completed",

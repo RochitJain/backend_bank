@@ -5,9 +5,7 @@ const AppError = require("../utils/AppError");
 const Joi = require("joi");
 const userLoginSchemaValidator = require("../validator/user/userLogin.schema");
 const userRegisterSchemaValidator = require("../validator/user/userRegistor.schema");
-const logger = require("../config/logger");
 async function userRegisterController(req, res) {
-  logger.info("in userRegisterController");
 
   const { error, value } = userRegisterSchemaValidator.validate(req.body, {
     abortEarly: false,
@@ -24,7 +22,6 @@ async function userRegisterController(req, res) {
   }
   
   const user = await userService.createUser(email, password, name);
-  logger.info("User Registered with name", user.name);
   return res.status(201).json({
     success: true,
     message: "User Registered Successfully",
@@ -39,7 +36,6 @@ async function userRegisterController(req, res) {
 }
 
 async function userLoginContoller(req, res) {
-  logger.info("in userLoginController");
   const { error, value } = userLoginSchemaValidator.validate(req.body, {
     abortEarly: false,
   });
@@ -47,7 +43,6 @@ async function userLoginContoller(req, res) {
     const errorDetails = error.details.map((err) => err.message);
     throw new AppError(errorDetails, 400);
   }
-  logger.info("input validated");
   const { email, password } = value;
   const user = await userService.checkUserExists(email);
 
@@ -60,7 +55,6 @@ async function userLoginContoller(req, res) {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY, {
     expiresIn: "1d",
   });
-  logger.info(`${user.name} user logged in`);
   res.cookie("token", token);
   res.status(201).json({
     _id: user._id,
@@ -71,13 +65,11 @@ async function userLoginContoller(req, res) {
 }
 
 async function userLogoutController(req, res) {
-  logger.info("in userLogoutController");
   const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(200).json("User already logged out");
 
   res.clearCookie("token");
   await blacklistModel.create({ token });
-  logger.info("User logged out successfully");
   return res.status(200).json("User logged out successfully");
 }
 

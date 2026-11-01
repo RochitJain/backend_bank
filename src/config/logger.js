@@ -10,19 +10,12 @@ const logger = winston.createLogger({
       stack: true
     }),
 
-    winston.format.printf(
-      ({ level, message, timestamp, stack }) => {
-
-        return stack
-          ? `[${timestamp}] ${level}: ${stack}`
-          : `[${timestamp}] ${level}: ${message}`;
-      }
-    )
+    winston.format.json(),
   ),
 
   transports: [
 
-    new winston.transports.Console(),
+    //new winston.transports.Console(),
 
     new winston.transports.File({
       filename: "logs/error.log",
