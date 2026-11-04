@@ -25,7 +25,6 @@ app.get("/", (req, res) => {
   res.send("Project is Live");
 });
 app.get("/metrics", async (req, res) => {
-/Users/rochit/incidentCopilot/src/config/metricsParser.js
     res.set("Content-Type", register.contentType);
     res.end(await register.metrics());
 });

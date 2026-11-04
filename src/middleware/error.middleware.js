@@ -6,6 +6,7 @@ function errorMiddleware (err, req, res, next) {
     success: false,
     message: err.message
   });
+  req.errorMessage = err.message
 };
 
 module.exports = errorMiddleware;

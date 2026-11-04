@@ -44,6 +44,7 @@ async function userLoginContoller(req, res) {
     throw new AppError(errorDetails, 400);
   }
   const { email, password } = value;
+  
   const user = await userService.checkUserExists(email);
 
   if (!user) throw new AppError("User not found", 422);

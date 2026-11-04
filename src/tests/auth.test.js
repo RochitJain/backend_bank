@@ -59,7 +59,6 @@ describe("Auth API", () => {
       password: '123456'
     })
     const response = await agent.get('/api/v1/account/balance')
-    console.log('balance',response.body)
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true)
   })

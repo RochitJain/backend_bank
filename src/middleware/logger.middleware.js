@@ -19,7 +19,6 @@ const requestLogger = (req, res, next) => {
         // Convert nanoseconds into milliseconds
         const durationMs =
             Number(endTime - startTime) / 1_000_000;
-
    
         const statusCode = res.statusCode;
 
@@ -42,7 +41,7 @@ const requestLogger = (req, res, next) => {
         const logData = {
             service: 'banking-ledger',
             level,
-            message: "HTTP request completed",
+            message: req.errorMessage || 'Http request complete',
             requestId,
             method: req.method,
             endpoint: req.originalUrl,
@@ -51,8 +50,8 @@ const requestLogger = (req, res, next) => {
         }
         logger.log(logData);
         await sendLog(logData).then().catch((error)=>{
-            throw new AppError(error, 500)
-        })
+             throw new AppError(error, 500)
+         })
     });
     
     next();

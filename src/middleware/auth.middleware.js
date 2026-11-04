@@ -11,6 +11,7 @@ async function authMiddleware(req, res, next) {
   if (isTokenBlacklisted) throw new AppError("Invalid token, login again", 401);
 
   const id = jwt.verify(token, process.env.JWT_KEY);
+
   const userData = await userModel.findById(id.userId);
   if (!userData) throw new AppError("User not found", 403);
   req.user = userData;
@@ -22,7 +23,7 @@ async function authSystemMiddleware(req, res, next) {
     req.cookies.token ||
     (req.authHeader && req.authHeader.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
-      : null);
+      : null)
   
   
   if (!token) throw new AppError("User not authorized", 403)
