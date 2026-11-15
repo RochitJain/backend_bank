@@ -5,7 +5,7 @@ async function checkAccountDetails(id) {
   const accountDetails = await accountModel.findById({
     _id: id,
   });
-  if (!accountDetails) throw new AppError("To Account not found", 404);
+  // if (!accountDetails) throw new AppError("To Account not found", 404);
 
   return accountDetails;
 }
@@ -15,7 +15,7 @@ async function checkSystemAccountDetails(user) {
     user: user._id,
     admin: true,
   });
-  if (!accountDetails) throw new AppError("From Account not found", 404);
+  // if (!accountDetails) throw new AppError("From Account not found", 404);
 
   return accountDetails;
 }
@@ -30,9 +30,9 @@ async function create(user) {
 
 async function getAccountDetails(user) {
   const accounts = await accountModel.findOne({ user });
-  if (!accounts) {
-    throw new AppError("Account not found", 404);
-  }
+  // if (!accounts) {
+  //   throw new AppError("Account not found", 404);
+  // }
   return accounts;
 }
 

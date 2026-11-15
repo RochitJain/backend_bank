@@ -1,5 +1,3 @@
-const requestLogger = require("../middleware/logger.middleware");
-
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { min } = require("../validator/user/userLogin.schema");
 
 const ledgerSchema = new mongoose.Schema(
   {
@@ -13,6 +14,7 @@ const ledgerSchema = new mongoose.Schema(
       type: Number,
       required: [true, "amount needed"],
       immutable: true,
+      min: [0.01, "Amount greater than 0"]
     },
     transaction: {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +37,8 @@ const ledgerSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+ledgerSchema.index({account: 1, createdAt: -1})
 
 function immutableError() {
   throw new Error("Ledger entries cannot be modified");

@@ -6,7 +6,8 @@ async function sendLog(log) {
         log
     ).then((res)=>{
         return 'done'
-    }).catch ((err)=> { throw new AppError(err,500)})
+    }).catch ((err)=> { 
+        throw new AppError(err,500)})
 }
 
 module.exports = sendLog

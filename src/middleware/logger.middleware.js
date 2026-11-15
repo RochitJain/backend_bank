@@ -50,7 +50,7 @@ const requestLogger = (req, res, next) => {
         }
         logger.log(logData);
         await sendLog(logData).then().catch((error)=>{
-             throw new AppError(error, 500)
+             throw error
          })
     });
     

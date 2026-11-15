@@ -14,6 +14,7 @@ const transactionSchema = new mongoose.Schema(
       required: [true, "To Account needed for entry"],
       index: true,
       ref: "account",
+      immutable: true
     },
     status: {
       type: String,
@@ -26,12 +27,11 @@ const transactionSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: [true, "amount needed"],
-      min: [0, "Amount cannot be negative"],
+      min: [0.01, "Amount should be more than 0"],
     },
     idempotencyKey: {
       type: String,
       required: [true, "Idempotency key is required"],
-      index: true,
       unique: true,
     },
   },
