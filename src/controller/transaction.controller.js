@@ -25,8 +25,8 @@ async function createTransactionController(req, res) {
   if (!fromAccountDetails) {
     throw new AppError("Account not found", 404);
   }
-  if(fromAccountDetails._id.toString() === toAccount){
-    throw new AppError('Cant transfer to same account',404)
+  if (fromAccountDetails._id.toString() === toAccount) {
+    throw new AppError('Cant transfer to same account', 404)
   }
 
   const toAccountDetails = await accountService.checkAccountDetails(toAccount);
@@ -36,7 +36,6 @@ async function createTransactionController(req, res) {
   const isTransactionExists =
     await transactionService.isTransactionExists(idempotencyKey);
   if (isTransactionExists) return res.json(isTransactionExists);
-  
   //account status check
   if (
     fromAccountDetails.status !== "ACTIVE" ||
@@ -149,7 +148,7 @@ async function createInitialTransactionController(req, res) {
   try {
     session.startTransaction();
 
-    const transaction =( await transactionModel.create(
+    const transaction =(await transactionModel.create(
       [
         {
           fromAccount: fromAccountDetails._id,
