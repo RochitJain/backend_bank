@@ -10,11 +10,11 @@ let isShuttingDown = false;
 
 async function startServer() {
     try {
-        await connectDB();
         connectRedis();
 
         server = app.listen(PORT, () => {
             logger.info({
+                service: 'banking-ledger',
                 message: `Server is running on port ${PORT}`,
                 event: "server started",
             });
@@ -34,6 +34,7 @@ async function shutdown(signal) {
         server.close(async () => {
             await mongoose.connection.close();
             logger.info({
+                service: 'banking-ledger',
                 message: "Application shut down successfully",
                 event: "database_disconnected",
             });

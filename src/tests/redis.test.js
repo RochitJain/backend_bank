@@ -8,6 +8,7 @@ async function getCache(key){
     return data ? JSON.parse(data) : null
     }catch(err){
         logger.warn({
+            service: 'banking-ledger',
             error: err.message,
             event: 'Cant fetch data'
         })
@@ -24,6 +25,7 @@ async function setCache(key,value){
         return true
     }catch(err){
         logger.warn({
+            service: 'banking-ledger',
             error: err.message,
             event: 'Cant set data in redis'
         })
@@ -39,6 +41,7 @@ async function deleteCache(key) {
     return true;
   } catch (err) {
     logger.warn({
+        service: 'banking-ledger',
       event: "redis_cache_delete_failed",
       error: err.message,
     });

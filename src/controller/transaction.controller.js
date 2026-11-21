@@ -108,6 +108,7 @@ async function createTransactionController(req, res) {
       await session.abortTransaction();
     } catch (abortErr) {
       logger.error({
+        service: 'banking-ledger',
         message: "Failed to abort MongoDB transaction",
         error: abortErr.message,
       });
@@ -197,6 +198,7 @@ async function createInitialTransactionController(req, res) {
       await session.abortTransaction();
     } catch (abortErr) {
       logger.error({
+        service: 'banking-ledger',
         message: "Failed to abort MongoDB transaction",
         error: abortErr.message,
       });

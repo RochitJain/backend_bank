@@ -12,30 +12,48 @@ const client = createClient({
 
 client.on("error", (err) => {
   logger.error({
+    service: 'banking-ledger',
     message: "Redis client error",
     event: err.code,
   });
 });
 
 client.on("connect", () => {
-  logger.info("Redis connecting");
+  logger.info({
+      service: 'banking-ledger',
+      event: "redis_connecting",
+      message: "Redis connecting",
+    });
 });
 
 client.on("ready", () => {
-  logger.info("Redis connection ready");
+  logger.info({
+      service: 'banking-ledger',
+      event: "redis_connection_ready",
+      message: "Redis connection ready",
+    });
 });
 
 client.on("reconnecting", () => {
-  logger.warn("Redis reconnecting");
+  logger.warn({
+      service: 'banking-ledger',
+      event: "redis_reconnecting",
+      message: "Redis is reconnecting",
+    });
 });
 
 client.on("end", () => {
-  logger.warn("Redis connection closed");
+  logger.warn({
+      service: 'banking-ledger',
+      event: "redis_connection_closed",
+      message: "Redis connection closed",
+    });
 });
 
 function connectRedis (){
 if (!process.env.REDIS_URL) {
     logger.warn({
+      service: 'banking-ledger',
       event: "redis_configuration_missing",
       message: "Redis is disabled because REDIS_URL is missing",
     });
@@ -45,6 +63,7 @@ if (!process.env.REDIS_URL) {
     client.connect().then(res=> {return }).catch(err=>{
     console.log(err)
     logger.error({
+      service: 'banking-ledger',
         message: 'redis failed',
         event: err.code
     })

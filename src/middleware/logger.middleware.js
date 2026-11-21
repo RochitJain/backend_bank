@@ -50,7 +50,11 @@ const requestLogger = (req, res, next) => {
         }
         logger.log(logData);
         await sendLog(logData).then().catch((error)=>{
-             throw error
+             logger.error({
+                service: 'banking-ledger',
+                message: 'log insertion failed',
+                event: error.message
+             })
          })
     });
     
